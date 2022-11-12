@@ -79,7 +79,7 @@ def teardown_request(exception):
     """
   At the end of the web request, this makes sure to close the database connection.
   If you don't the database could run out of memory!
-  """ 
+  """
     try:
         g.conn.close()
     except Exception as e:
@@ -178,7 +178,8 @@ def add():
     return redirect('/')
 
 
-##
+#
+# CODE DERIVED FROM https://flask.palletsprojects.com/en/2.2.x/tutorial
 @app.route("/register", methods=("GET", "POST"))
 def register():
     """Register a new user.
@@ -186,29 +187,29 @@ def register():
     password for security.
     """
     if request.method == "POST":
-        username = request.form["username"]
-        password = request.form["password"]
+        users_login = request.form["users_login"]
+        users_password = request.form["users_password"]
         error = None
 
-        if not username:
+        if not users_login:
             error = "Username is required."
-        elif not password:
+        elif not users_password:
             error = "Password is required."
 
         if error is None:
             try:
                 g.conn.execute(
-                    "INSERT INTO user (username, password) VALUES (?, ?)",
-                    (username, generate_password_hash(password)),
+                    "INSERT INTO users (users_login, users_password) VALUES (?, ?)",
+                    (users_login, generate_password_hash(users_password)),
                 )
                 g.conn.commit()
             except g.conn.IntegrityError:
                 # The username was already taken, which caused the
                 # commit to fail. Show a validation error.
-                error = f"User {username} is already registered."
+                error = f"User {users_login} is already registered."
             else:
                 # Success, go to the login page.
-                return redirect(url_for("auth.login"))
+                return redirect(url_for("/login"))
 
         flash(error)
 
@@ -216,6 +217,33 @@ def register():
 
 
 ##
+
+# CODE DERIVED FROM https://flask.palletsprojects.com/en/2.2.x/tutorial
+@app.route("/login", methods=("GET", "POST"))
+def login():
+    """Log in a registered user by adding the user id to the session."""
+    if request.method == "POST":
+        users_login = request.form["users_login"]
+        users_password = request.form["users_password"]
+        error = None
+        users = g.conn.execute(
+            "SELECT * FROM users WHERE users_login = ?", (users_login,)
+        ).fetchone()
+
+        if users is None:
+            error = "Incorrect username."
+        elif not check_password_hash(users["password"], users_password):
+            error = "Incorrect password."
+
+        if error is None:
+            # store the user id in a new session and return to the index
+            session.clear()
+            session["user_id"] = users["id"]
+            return redirect(url_for("index"))
+
+        flash(error)
+
+    return render_template("login.html")
 
 
 #
