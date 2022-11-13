@@ -17,6 +17,7 @@ Read about it online.
 """
 
 import os
+import uuid
 from sqlalchemy import *
 from sqlalchemy.pool import NullPool
 from flask import Flask, request, render_template, g, redirect, Response, url_for, flash, session
@@ -181,6 +182,8 @@ def load_logged_in_user():
         g.user = (
             g.conn().execute("SELECT * FROM user WHERE uid = %s", (uid,)).fetchone()
         )
+
+
 # Example of adding new data to the database
 
 
@@ -254,10 +257,10 @@ def register():
                 # insert_uid = 'INSERT INTO users(uid) SELECT MAX(uid) +1 FROM Users';
                 # g.conn.execute(insert_uid);
                 g.conn.execute(
-                    "INSERT INTO users (users_login, users_password) VALUES (%s, %s)",
-                    (users_login, users_password),
+                    "INSERT INTO users (users_login, users_password, uid) VALUES (%s, %s, %s)",
+                    (users_login, users_password, uuid.uuid4()),
                 )
-                #g.conn.commit()
+                # g.conn.commit()
             except g.conn.IntegrityError:
                 # The username was already taken, which caused the
                 # commit to fail. Show a validation error.
@@ -313,14 +316,14 @@ def login():
     return render_template("login.html")
 
 
-
-
-@app.route("/register", methods=("GET", "POST"))
+@app.route("/upload_job", methods=("GET", "POST"))
 def upload_job():
     """Register a new job.
     Validates that the username is not already taken. Hashes the
     password for security.
     """
+    jobtypes_server = g.conn.execute("SELECT DISTINCT job_type FROM  DataJobs_Belong ORDER BY  job_type ASC")
+
     if request.method == "POST":
         company = request.form['company']
         print(company)
@@ -334,31 +337,33 @@ def upload_job():
         salary = request.form['salary']
         print(salary)
 
-        job_type = request.form['job_type'] #dropdown 4 choices
+        job_type = request.form['job_type']  # dropdown 4 choices
         print(job_type)
 
         error = None
 
-        if not users_login:
-            error = "Username is required."
-        elif not users_password:
-            error = "Password is required."
+        if not company:
+            error = "Company is required."
+        elif not location:
+            error = "Location is required."
+        elif not position_name:
+            error = "Position name is required."
+        elif not salary:
+            error = "Salary is required"
+        elif not job_type:
+            error = "Job type is required."
+
         # Must execute all commands in one line.
         if error is None:
             try:
-                # insert_login = 'INSERT INTO users(users_login) VALUES (:users_login1)';
-                # g.conn.execute(text(insert_login), users_login1=users_login);
-                #
-                # insert_password = 'INSERT INTO users(users_password) VALUES (:users_password1)';
-                # g.conn.execute(text(insert_password), users_password1=users_password);
-                #
-                # insert_uid = 'INSERT INTO users(uid) SELECT MAX(uid) +1 FROM Users';
-                # g.conn.execute(insert_uid);
                 g.conn.execute(
-                    "INSERT INTO DataJobs_Belong (users_login, users_password) VALUES (%s, %s)",
-                    (users_login, users_password),
+                    "INSERT INTO DataJobs_Belong (company, location, position_name, salary, job_type, job_id) "
+                    "VALUES (%s, %s, %s, %s, %s, %s)",
+                    (company, location, position_name, salary, job_type, uuid.uuid4()),
+                    # job_id is primary key, but incrementing +1 is not secure.
+                    # uuid generates random non-conflicting id.
                 )
-                #g.conn.commit()
+                # g.conn.commit()
             except g.conn.IntegrityError:
                 # The username was already taken, which caused the
                 # commit to fail. Show a validation error.
@@ -369,7 +374,54 @@ def upload_job():
 
         flash(error)
 
-    return render_template("register.html")
+    return render_template("upload_job.html", jobtypes_server=jobtypes_server)
+
+
+@app.route("/upload_ads", methods=("GET", "POST"))
+def upload_ads():
+    """Register a new ad.
+
+    """
+    if request.method == "POST":
+        target_audience = request.form['target_audience']
+        print(target_audience)
+
+        ad_cost = request.form['ad_cost']
+        print(ad_cost)
+
+        ad_position = request.form['ad_position']
+        print(ad_position)
+
+        error = None
+
+        if not target_audience:
+            error = "Target audience is required."
+        elif not ad_cost:
+            error = "Ad cost is required."
+        elif not ad_position:
+            error = "Ad position is required."
+
+        # Must execute all commands in one line.
+        if error is None:
+            try:
+                g.conn.execute(
+                    "INSERT INTO Ads (target_audience, ad_cost, ad_position, ad_id)"
+                    "VALUES (%s, %s, %s, %s)",
+                    (target_audience, ad_cost, ad_position, uuid.uuid4()),
+                )
+                # g.conn.commit()
+            except g.conn.IntegrityError:
+                # The username was already taken, which caused the
+                # commit to fail. Show a validation error.
+                error = f"User {login} is already registered."
+            else:
+                # Success, go to the login page.
+                return redirect(url_for("login"))
+
+        flash(error)
+
+    return render_template("upload_ads.html")
+
 
 #
 # @app.route('/login')
@@ -384,7 +436,6 @@ def update_users():
         print(request.form.getlist('mycheckbox'))
         return 'Done'
     return render_template("update.html")
-
 
 
 if __name__ == "__main__":

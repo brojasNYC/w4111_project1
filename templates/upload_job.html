@@ -4,22 +4,27 @@
 
   <form method="post">
     <label for="users_login">Company</label>
-    <input name="users_login" id="username" required>
+    <input name="company" id="company" required>
 	
-    <label for="users_password">Position Location</label>
-    <input type="users_password" name="users_password" id="password" required>
+    <label for="location">Position Location</label>
+    <input type="location" name="location" id="location" required>
 	
-	<label for="users_password">Position Name</label>
-    <input type="users_password" name="users_password" id="password" required>
+	<label for="position_name">Position Name</label>
+    <input type="position_name" name="position_name" id="salary" required>
 	
-	<label for="users_password">Salary</label>
-    <input type="users_password" name="users_password" id="password" required>
+	<label for="salary">Salary</label>
+    <input type="salary" name="salary" id="salary" required>
 	
-	<label for="users_password">Job Type</label>
-    <input type="users_password" name="users_password" id="password" required>
+	<!--<label for="job_type">Job Type</label>
+    <input type="job_type" name="job_type" id="job_type" required> --> 
+
+ <!--https://hackanons.com/2021/09/flask-dropdown-menu-everything-you-need-to-know.html-->
+
+Choose Job Type <SELECT name="Job Type">
+{% for jobs in jobtypes_server %}
+    <OPTION value={{jobs.job_type}}>{{jobs.job_type}}</option>
+{% endfor %}
+</SELECT>	
 	
-	<label for="users_password">Skills Needed</label>
-    <input type="users_password" name="users_password" id="password" required>
-	
-    <input type="submit" value="Register">
+    <input type="submit" value="Upload Job">
   </form>
