@@ -19,7 +19,7 @@ Read about it online.
 import os
 from sqlalchemy import *
 from sqlalchemy.pool import NullPool
-from flask import Flask, request, render_template, g, redirect, Response, url_for, flash
+from flask import Flask, request, render_template, g, redirect, Response, url_for, flash, session
 from werkzeug.security import generate_password_hash
 
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
@@ -115,6 +115,7 @@ def index():
     #
     # example of a database query
     #
+
     cursor = g.conn.execute("SELECT name FROM pika_table")
     names = []
     for result in cursor:
@@ -168,7 +169,21 @@ def another():
     return render_template("anotherfile.html")
 
 
+@app.before_request
+def load_logged_in_user():
+    """If a user id is stored in the session, load the user object from
+    the database into ``g.user``."""
+    uid = session.get("uid")
+
+    if uid is None:
+        g.user = None
+    else:
+        g.user = (
+            g.conn().execute("SELECT * FROM user WHERE uid = %s", (uid,)).fetchone()
+        )
 # Example of adding new data to the database
+
+
 @app.route('/add', methods=['POST'])
 def add():
     name = request.form['name']
@@ -180,6 +195,36 @@ def add():
 
 #
 # CODE DERIVED FROM https://flask.palletsprojects.com/en/2.2.x/tutorial
+
+# Here we create a test table and insert some values in it
+# engine.execute("""DROP TABLE IF EXISTS pika_table;""")
+# engine.execute("""CREATE TABLE IF NOT EXISTS pika_table (
+#   id serial,
+#   name text
+# );""")
+# engine.execute("""INSERT INTO pika_table(name) VALUES ('grace hopper'), ('alan turing'), ('ada lovelace');""")
+
+# def add():
+#     name = request.form['name']
+#     print(name)
+#     cmd = 'INSERT INTO pika_table(name) VALUES (:name1)';
+#     g.conn.execute(text(cmd), name1=name);
+#     return redirect('/')
+
+# @app.route('/register', methods=['GET', 'POST'])
+# def register():
+#     if request.method == "POST":
+#         users_login = request.form['users_login']
+#         print(users_login)
+#         users_password = request.form['users_password']
+#         print(users_password)
+#         cmd1 = 'INSERT INTO users(users_login) VALUES (:users_login1)';
+#         g.conn.execute(text(cmd1), users_login1=users_login);
+#         cmd2 = 'INSERT INTO users(users_password) VALUES (:users_password1)';
+#         g.conn.execute(text(cmd2), users_password1=users_password);
+#         return redirect('register.html')
+# #
+
 @app.route("/register", methods=("GET", "POST"))
 def register():
     """Register a new user.
@@ -187,29 +232,39 @@ def register():
     password for security.
     """
     if request.method == "POST":
-        users_login = request.form["users_login"]
-        users_password = request.form["users_password"]
+        users_login = request.form['users_login']
+        print(users_login)
+        users_password = request.form['users_password']
+        print(users_password)
         error = None
 
         if not users_login:
             error = "Username is required."
         elif not users_password:
             error = "Password is required."
-
+        # Must execute all commands in one line.
         if error is None:
             try:
+                # insert_login = 'INSERT INTO users(users_login) VALUES (:users_login1)';
+                # g.conn.execute(text(insert_login), users_login1=users_login);
+                #
+                # insert_password = 'INSERT INTO users(users_password) VALUES (:users_password1)';
+                # g.conn.execute(text(insert_password), users_password1=users_password);
+                #
+                # insert_uid = 'INSERT INTO users(uid) SELECT MAX(uid) +1 FROM Users';
+                # g.conn.execute(insert_uid);
                 g.conn.execute(
-                    "INSERT INTO users (users_login, users_password) VALUES (?, ?)",
-                    (users_login, generate_password_hash(users_password)),
+                    "INSERT INTO users (users_login, users_password) VALUES (%s, %s)",
+                    (users_login, users_password),
                 )
-                g.conn.commit()
+                #g.conn.commit()
             except g.conn.IntegrityError:
                 # The username was already taken, which caused the
                 # commit to fail. Show a validation error.
-                error = f"User {users_login} is already registered."
+                error = f"User {login} is already registered."
             else:
                 # Success, go to the login page.
-                return redirect(url_for("/login"))
+                return redirect(url_for("login"))
 
         flash(error)
 
@@ -218,7 +273,12 @@ def register():
 
 ##
 
+
 # CODE DERIVED FROM https://flask.palletsprojects.com/en/2.2.x/tutorial
+# difference between session.execute and engine.execute
+# https://stackoverflow.com/questions/47190680/sqlalchemy-exc-programmingerror-psycopg2-programmingerror-syntax-error-at-or
+# solves error sqlalchemy.exc.ProgrammingError: (psycopg2.errors.SyntaxError) syntax error at or near ":"
+# LINE 1: SELECT * FROM users WHERE users_login = :users_login
 @app.route("/login", methods=("GET", "POST"))
 def login():
     """Log in a registered user by adding the user id to the session."""
@@ -227,18 +287,25 @@ def login():
         users_password = request.form["users_password"]
         error = None
         users = g.conn.execute(
-            "SELECT * FROM users WHERE users_login = ?", (users_login,)
+            "SELECT * FROM users WHERE users_login = %s", (users_login,)
         ).fetchone()
+
+        # users = g.conn.execute(text(
+        #     'SELECT * FROM users WHERE users_login = :users_login', {users_login})
+        # ).fetchone()
+        #
+        # users = 'INSERT INTO users(users_login) VALUES (:users_login1)';
+        # g.conn.execute(text(insert_login), users_login1=users_login).fetchone();
 
         if users is None:
             error = "Incorrect username."
-        elif not check_password_hash(users["password"], users_password):
+        elif not (users["users_password"], users_password):
             error = "Incorrect password."
 
         if error is None:
             # store the user id in a new session and return to the index
             session.clear()
-            session["user_id"] = users["id"]
+            session["user_id"] = users["uid"]
             return redirect(url_for("index"))
 
         flash(error)
@@ -270,7 +337,7 @@ if __name__ == "__main__":
     Show the help text using
         python server.py --help
     """
-
+        app.secret_key = 'super secret key'
         HOST, PORT = host, port
         print("running on %s:%d" % (HOST, PORT))
         app.run(host=HOST, port=PORT, debug=debug, threaded=threaded)
