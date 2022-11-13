@@ -313,11 +313,78 @@ def login():
     return render_template("login.html")
 
 
+
+
+@app.route("/register", methods=("GET", "POST"))
+def upload_job():
+    """Register a new job.
+    Validates that the username is not already taken. Hashes the
+    password for security.
+    """
+    if request.method == "POST":
+        company = request.form['company']
+        print(company)
+
+        location = request.form['location']
+        print(location)
+
+        position_name = request.form['position_name']
+        print(position_name)
+
+        salary = request.form['salary']
+        print(salary)
+
+        job_type = request.form['job_type'] #dropdown 4 choices
+        print(job_type)
+
+        error = None
+
+        if not users_login:
+            error = "Username is required."
+        elif not users_password:
+            error = "Password is required."
+        # Must execute all commands in one line.
+        if error is None:
+            try:
+                # insert_login = 'INSERT INTO users(users_login) VALUES (:users_login1)';
+                # g.conn.execute(text(insert_login), users_login1=users_login);
+                #
+                # insert_password = 'INSERT INTO users(users_password) VALUES (:users_password1)';
+                # g.conn.execute(text(insert_password), users_password1=users_password);
+                #
+                # insert_uid = 'INSERT INTO users(uid) SELECT MAX(uid) +1 FROM Users';
+                # g.conn.execute(insert_uid);
+                g.conn.execute(
+                    "INSERT INTO DataJobs_Belong (users_login, users_password) VALUES (%s, %s)",
+                    (users_login, users_password),
+                )
+                #g.conn.commit()
+            except g.conn.IntegrityError:
+                # The username was already taken, which caused the
+                # commit to fail. Show a validation error.
+                error = f"User {login} is already registered."
+            else:
+                # Success, go to the login page.
+                return redirect(url_for("login"))
+
+        flash(error)
+
+    return render_template("register.html")
+
 #
 # @app.route('/login')
 # def login():
 #     abort(401)
 #     this_is_never_executed()
+
+
+@app.route("/update", methods=("GET", "POST"))
+def update_users():
+    if request.method == 'POST':
+        print(request.form.getlist('mycheckbox'))
+        return 'Done'
+    return render_template("update.html")
+
 
 
 if __name__ == "__main__":
