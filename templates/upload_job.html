@@ -20,10 +20,13 @@
 
  <!--https://hackanons.com/2021/09/flask-dropdown-menu-everything-you-need-to-know.html-->
 
-Choose Job Type <SELECT name="Job Type">
+Choose Job Type 
+<label for="job_type">Job Type</label>
+<SELECT name="Job Type">
 {% for jobs in jobtypes_server %}
     <OPTION value={{jobs.job_type}}>{{jobs.job_type}}</option>
 {% endfor %}
+<input type="job_type" name="job_type" id="job_type" required>
 </SELECT>	
 	
     <input type="submit" value="Upload Job">
