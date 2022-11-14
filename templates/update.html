@@ -1,16 +1,139 @@
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Update your Account</title>
-</head>
-<body>
-    <form method="POST" action="/">
-        Checkbox 1<input type="checkbox" value="1" name="mycheckbox">
-        Checkbox 2<input type="checkbox" value="2" name="mycheckbox">
-        Checkbox 3<input type="checkbox" value="3" name="mycheckbox">
-        <input type="submit">
-    </form>
-</body>
-</html>
+
+  <h1>Update your Information</h1>
+
+
+  <form action="/upload_job" method="post">
+    <label for="users_login">Company</label>
+    <input name="company" id="company" required>
+	
+    <label for="location">Position Location</label>
+    <input type="location" name="location" id="location" required>
+	
+	<label for="position_name">Position Name</label>
+    <input type="position_name" name="position_name" id="salary" required>
+	
+	<label for="salary">Salary</label>
+    <input type="salary" name="salary" id="salary" required>
+	
+
+ Choose Job Type 
+<SELECT name='job_type', method = "GET" action "/">
+{% for jobs in jobtypes_server %}
+    <OPTION value="{{jobs}}">{{jobs}}</option>
+{% endfor %}
+</SELECT>	
+
+
+python
+<SELECT name='python', method = "GET" action "/">
+{% for bool in bool_list %}
+    <OPTION value="{{bool}}">{{bool}}</option>
+{% endfor %}
+</SELECT>	
+
+Scala 
+<SELECT name='scala', method = "GET" action "/">
+{% for bool in bool_list %}
+    <OPTION value="{{bool}}">{{bool}}</option>
+{% endfor %}
+</SELECT>	
+
+java
+<SELECT name='java', method = "GET" action "/">
+{% for bool in bool_list %}
+    <OPTION value="{{bool}}">{{bool}}</option>
+{% endfor %}
+</SELECT>	
+
+excel
+<SELECT name='excel', method = "GET" action "/">
+{% for bool in bool_list %}
+    <OPTION value="{{bool}}">{{bool}}</option>
+{% endfor %}
+</SELECT>	
+
+powerpoint
+<SELECT name='powerpoint', method = "GET" action "/">
+{% for bool in bool_list %}
+    <OPTION value="{{bool}}">{{bool}}</option>
+{% endfor %}
+</SELECT>	
+
+google_analytics
+<SELECT name='google_analytics', method = "GET" action "/">
+{% for bool in bool_list %}
+    <OPTION value="{{bool}}">{{bool}}</option>
+{% endfor %}
+</SELECT>	
+
+matlab
+<SELECT name='matlab', method = "GET" action "/">
+{% for bool in bool_list %}
+    <OPTION value="{{bool}}">{{bool}}</option>
+{% endfor %}
+</SELECT>	
+
+power_bi
+<SELECT name='power_bi', method = "GET" action "/">
+{% for bool in bool_list %}
+    <OPTION value="{{bool}}">{{bool}}</option>
+{% endfor %}
+</SELECT>	
+
+tableau
+<SELECT name='tableau', method = "GET" action "/">
+{% for bool in bool_list %}
+    <OPTION value="{{bool}}">{{bool}}</option>
+{% endfor %}
+</SELECT>	
+
+aws
+<SELECT name='aws', method = "GET" action "/">
+{% for bool in bool_list %}
+    <OPTION value="{{bool}}">{{bool}}</option>
+{% endfor %}
+</SELECT>	
+
+hive
+<SELECT name='hive', method = "GET" action "/">
+{% for bool in bool_list %}
+    <OPTION value="{{bool}}">{{bool}}</option>
+{% endfor %}
+</SELECT>	
+
+spark
+<SELECT name='spark', method = "GET" action "/">
+{% for bool in bool_list %}
+    <OPTION value="{{bool}}">{{bool}}</option>
+{% endfor %}
+</SELECT>	
+
+postgres
+<SELECT name='postgres', method = "GET" action "/">
+{% for bool in bool_list %}
+    <OPTION value="{{bool}}">{{bool}}</option>
+{% endfor %}
+</SELECT>	
+
+azure
+<SELECT name='azure', method = "GET" action "/">
+{% for bool in bool_list %}
+    <OPTION value="{{bool}}">{{bool}}</option>
+{% endfor %}
+</SELECT>	
+
+skill_sql
+<SELECT name='skill_sql', method = "GET" action "/">
+{% for bool in bool_list %}
+    <OPTION value="{{bool}}">{{bool}}</option>
+{% endfor %}
+</SELECT>
+	
+
+    <!-- <button class="button execute" name="submit" value="submit">Submit</button>	--> 
+
+<input type="submit" value="Update User"> 
+ 
+
+ 
+</form> 

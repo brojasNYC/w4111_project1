@@ -2,9 +2,33 @@
   <h1>Upload a New Ad</h1>
 
 
-  <form method="post">
-    <label for="target_audience">Target audience</label>
-    <input name="target_audience" id="target_audience" required>
+  <form action="/upload_ads" method="post">
+  
+ Choose Target audience 
+<SELECT name='target_audience', method = "GET" action "/">
+{% for groups in target_audience_groups %}
+    <OPTION value="{{groups}}">{{groups}}</option>
+{% endfor %}
+</SELECT>	
+	
+ Choose Ad Cost Package 
+<SELECT name='ad_cost', method = "GET" action "/">
+{% for cost_amounts in ad_cost_dropdown %}
+    <OPTION value="{{cost_amounts}}">{{cost_amounts}}</option>
+{% endfor %}
+</SELECT>	
+	
+ Choose Ad Position  
+<SELECT name='ad_position', method = "GET" action "/">
+{% for spots in ad_position_options %}
+    <OPTION value="{{spots}}">{{spots}}</option>
+{% endfor %}
+</SELECT>	
+
+<input type="submit" value="Upload Job"> 
+
+</form>	
+<!--
 	
     <label for="ad_cost">Ad cost</label>
     <input type="ad_cost" name="ad_cost" id="ad_cost" required>
@@ -14,3 +38,4 @@
 	
     <input type="submit" value="Upload Ad">
   </form>
+-->

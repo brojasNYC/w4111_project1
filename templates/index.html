@@ -18,7 +18,35 @@
   </div>
 
 
+
+
+<ul>
+    {% if g.user %}
+      <li><span>{{ g.user['users_login'] }}</span>
+      <li><a href="{{ url_for('logout') }}">Log Out</a>
+    {% else %}
+      <li><a href="{{ url_for('register') }}">Register</a>
+      <li><a href="{{ url_for('login') }}">Log In</a>
+    {% endif %}
+  </ul>
+
+
+
+
+
+
+
+<br>
+<br>
+
+
 <p><a href="/another">See the Most Popular Data Skills!</a></p>
+
+<br>
+
+<p><a href="/search">Search Jobs</a></p>
+
+<br>
 <p><a href="/register">Sign Up</a></p>
 <p><a href="/login">Log In</a></p>
 <p><a href="/update">Update Profile</a></p>

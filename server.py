@@ -179,12 +179,12 @@ def load_logged_in_user():
     if uid is None:
         g.user = None
     else:
-        g.user = (
-            g.conn().execute("SELECT * FROM user WHERE uid = %s", (uid,)).fetchone()
-        )
-
-
-# Example of adding new data to the database
+        # g.user = (
+        #     g.conn().execute("SELECT * FROM users WHERE uid = %s"), user_id
+        # )
+        g.user = g.conn.execute(
+            "SELECT * FROM users WHERE uid = %s", (uid,)
+        ).fetchone()
 
 
 @app.route('/add', methods=['POST'])
@@ -196,43 +196,31 @@ def add():
     return redirect('/')
 
 
+@app.route("/search", methods=("GET", "POST"))
+# For william
+def search():
+    jobtypes_server = ['Data Scientist', 'Data Analyst', 'Data Engineer', 'ML Engineer']
+    searched_role = request.form["searched_role"]
+
+    cursor = g.conn.execute("SELECT * FROM datajobs_belong "
+                            "WHERE job_type =  %s", searched_role)
+    names = []
+
+    for result in cursor:
+        names.append(result['name'])  # can also be accessed using result[0]
+    cursor.close()
+
+    context = dict(data=names)
+    # return render_template("search.html", jobtypes_server=jobtypes_server, **context)
+
+
 #
 # CODE DERIVED FROM https://flask.palletsprojects.com/en/2.2.x/tutorial
-
-# Here we create a test table and insert some values in it
-# engine.execute("""DROP TABLE IF EXISTS pika_table;""")
-# engine.execute("""CREATE TABLE IF NOT EXISTS pika_table (
-#   id serial,
-#   name text
-# );""")
-# engine.execute("""INSERT INTO pika_table(name) VALUES ('grace hopper'), ('alan turing'), ('ada lovelace');""")
-
-# def add():
-#     name = request.form['name']
-#     print(name)
-#     cmd = 'INSERT INTO pika_table(name) VALUES (:name1)';
-#     g.conn.execute(text(cmd), name1=name);
-#     return redirect('/')
-
-# @app.route('/register', methods=['GET', 'POST'])
-# def register():
-#     if request.method == "POST":
-#         users_login = request.form['users_login']
-#         print(users_login)
-#         users_password = request.form['users_password']
-#         print(users_password)
-#         cmd1 = 'INSERT INTO users(users_login) VALUES (:users_login1)';
-#         g.conn.execute(text(cmd1), users_login1=users_login);
-#         cmd2 = 'INSERT INTO users(users_password) VALUES (:users_password1)';
-#         g.conn.execute(text(cmd2), users_password1=users_password);
-#         return redirect('register.html')
-# #
 
 @app.route("/register", methods=("GET", "POST"))
 def register():
     """Register a new user.
-    Validates that the username is not already taken. Hashes the
-    password for security.
+    Validates that the username is not already taken. - DOES NOT WORK?
     """
     if request.method == "POST":
         users_login = request.form['users_login']
@@ -248,14 +236,6 @@ def register():
         # Must execute all commands in one line.
         if error is None:
             try:
-                # insert_login = 'INSERT INTO users(users_login) VALUES (:users_login1)';
-                # g.conn.execute(text(insert_login), users_login1=users_login);
-                #
-                # insert_password = 'INSERT INTO users(users_password) VALUES (:users_password1)';
-                # g.conn.execute(text(insert_password), users_password1=users_password);
-                #
-                # insert_uid = 'INSERT INTO users(uid) SELECT MAX(uid) +1 FROM Users';
-                # g.conn.execute(insert_uid);
                 g.conn.execute(
                     "INSERT INTO users (users_login, users_password, uid) VALUES (%s, %s, %s)",
                     (users_login, users_password, uuid.uuid4()),
@@ -264,7 +244,7 @@ def register():
             except g.conn.IntegrityError:
                 # The username was already taken, which caused the
                 # commit to fail. Show a validation error.
-                error = f"User {login} is already registered."
+                error = f"User {users_login} is already registered."
             else:
                 # Success, go to the login page.
                 return redirect(url_for("login"))
@@ -308,12 +288,19 @@ def login():
         if error is None:
             # store the user id in a new session and return to the index
             session.clear()
-            session["user_id"] = users["uid"]
-            return redirect(url_for("/"))
+            session["uid"] = users["uid"]
+            return redirect('/')
 
         flash(error)
 
     return render_template("login.html")
+
+
+@app.route("/logout")
+def logout():
+    """Clear the current session, including the stored user id."""
+    session.clear()
+    return redirect(url_for("index"))
 
 
 @app.route("/upload_job", methods=("GET", "POST"))
@@ -322,8 +309,9 @@ def upload_job():
     Validates that the username is not already taken. Hashes the
     password for security.
     """
-    #jobtypes_server = g.conn.execute("SELECT DISTINCT job_type FROM DataJobs_Belong ORDER BY job_type ASC")
+    # jobtypes_server = g.conn.execute("SELECT DISTINCT job_type FROM DataJobs_Belong ORDER BY job_type ASC")
     jobtypes_server = ['Data Scientist', 'Data Analyst', 'Data Engineer', 'ML Engineer']
+    bool_list = ['TRUE', 'FALSE']
     if request.method == "POST":
         company = request.form['company']
         print(company)
@@ -339,6 +327,53 @@ def upload_job():
 
         job_type = request.form['job_type']  # dropdown 4 choices
         print(job_type)
+
+        # SKILLS #
+        python = request.form['python']
+        print(python)
+
+        scala = request.form['scala']
+        print(scala)
+
+        java = request.form['java']
+        print(java)
+
+        excel = request.form['excel']
+        print(excel)
+
+        powerpoint = request.form['powerpoint']
+        print(powerpoint)
+
+        google_analytics = request.form['google_analytics']
+        print(google_analytics)
+
+        matlab = request.form['matlab']
+        print(matlab)
+
+        power_bi = request.form['power_bi']
+        print(power_bi)
+
+        tableau = request.form['tableau']
+        print(tableau)
+
+        aws = request.form['aws']
+        print(aws)
+
+        hive = request.form['hive']
+        print(hive)
+
+        spark = request.form['spark']
+        print(spark)
+
+        postgres = request.form['postgres']
+        print(postgres)
+
+        azure = request.form['azure']
+        print(azure)
+
+        skill_sql = request.form['skill_sql']
+        print(skill_sql)
+        # SKILLS #
 
         error = None
 
@@ -357,9 +392,21 @@ def upload_job():
         if error is None:
             try:
                 g.conn.execute(
-                    "INSERT INTO DataJobs_Belong (company, location, position_name, salary, job_type, job_id) "
-                    "VALUES (%s, %s, %s, %s, %s, %s)",
-                    (company, location, position_name, salary, job_type, uuid.uuid4()),
+                    "INSERT INTO DataJobs_Belong "
+                    "(company, location, position_name, salary, job_type, job_id,"
+                    "python, scala, java, excel, powerpoint, google_analytics, matlab, power_bi, tableau, aws, hive, "
+                    "spark, postgres, azure, skill_sql, uid) "
+                    "VALUES "
+                    "(%s, %s, %s, %s, %s, %s,"  # 6 key parameters
+                    "%s, %s, %s, %s, %s, "  # skills, first 5
+                    "%s, %s, %s, %s, %s, "
+                    "%s, %s, %s, %s, %s, "  # skills last 5
+                    "%s)",  # uid who uploaded job
+                    (company, location, position_name, salary, job_type, uuid.uuid4(),
+                     python, scala, java, excel, powerpoint,
+                     google_analytics, matlab, power_bi, tableau, aws,
+                     hive, spark, postgres, azure, skill_sql, session["uid"]
+                     )
                     # job_id is primary key, but incrementing +1 is not secure.
                     # uuid generates random non-conflicting id.
                 )
@@ -374,7 +421,7 @@ def upload_job():
 
         flash(error)
 
-    return render_template("upload_job.html", jobtypes_server=jobtypes_server)
+    return render_template("upload_job.html", jobtypes_server=jobtypes_server, bool_list=bool_list)
 
 
 @app.route("/upload_ads", methods=("GET", "POST"))
@@ -382,6 +429,11 @@ def upload_ads():
     """Register a new ad.
 
     """
+
+    target_audience_groups = ['Data Scientist', 'Data Analyst', 'Data Engineer', 'ML Engineer']
+    ad_cost_dropdown = [100, 200, 300]
+    ad_position_options = ['Left', 'Right', 'Footer']
+
     if request.method == "POST":
         target_audience = request.form['target_audience']
         print(target_audience)
@@ -420,7 +472,8 @@ def upload_ads():
 
         flash(error)
 
-    return render_template("upload_ads.html")
+    return render_template("upload_ads.html", target_audience_groups=target_audience_groups,
+                           ad_cost_dropdown=ad_cost_dropdown, ad_position_options=ad_position_options)
 
 
 #
@@ -432,10 +485,118 @@ def upload_ads():
 
 @app.route("/update", methods=("GET", "POST"))
 def update_users():
-    if request.method == 'POST':
-        print(request.form.getlist('mycheckbox'))
-        return 'Done'
-    return render_template("update.html")
+    """
+Allows a CURRENTLY logged in user to update their account.
+Appends desired role, skills, email, name to a given uid based on login.
+
+INCOMPLETE
+
+    """
+
+    user_desired_roles = ['Data Scientist', 'Data Analyst', 'Data Engineer', 'ML Engineer']
+    bool_list = ['TRUE', 'FALSE']
+
+    if request.method == "POST":
+        desired_role = request.form['desired_role']
+        print(desired_role)
+
+        email = request.form['email']
+        print(email)
+
+        full_name = request.form['full_name']
+        print(full_name)
+
+        # SKILLS #
+        python = request.form['python']
+        print(python)
+
+        scala = request.form['scala']
+        print(scala)
+
+        java = request.form['java']
+        print(java)
+
+        excel = request.form['excel']
+        print(excel)
+
+        powerpoint = request.form['powerpoint']
+        print(powerpoint)
+
+        google_analytics = request.form['google_analytics']
+        print(google_analytics)
+
+        matlab = request.form['matlab']
+        print(matlab)
+
+        power_bi = request.form['power_bi']
+        print(power_bi)
+
+        tableau = request.form['tableau']
+        print(tableau)
+
+        aws = request.form['aws']
+        print(aws)
+
+        hive = request.form['hive']
+        print(hive)
+
+        spark = request.form['spark']
+        print(spark)
+
+        postgres = request.form['postgres']
+        print(postgres)
+
+        azure = request.form['azure']
+        print(azure)
+
+        skill_sql = request.form['skill_sql']
+        print(skill_sql)
+        # SKILLS #
+
+        error = None
+
+        if not company:
+            error = "Company is required."
+        elif not location:
+            error = "Location is required."
+        elif not position_name:
+            error = "Position name is required."
+        elif not salary:
+            error = "Salary is required"
+        elif not job_type:
+            error = "Job type is required."
+
+        # Must execute all commands in one line.
+        if error is None:
+            try:
+                g.conn.execute(
+                    "INSERT INTO users "
+                    "(desired_role, email, full_name,"
+                    "python, scala, java, excel, powerpoint, google_analytics, matlab, power_bi, tableau, aws, hive, "
+                    "spark, postgres, azure, skill_sql) "
+                    "VALUES "
+                    "(%s, %s, %s,"  # 3 key parameters
+                    "%s, %s, %s, %s, %s, "  # skills, first 5
+                    "%s, %s, %s, %s, %s, "
+                    "%s, %s, %s, %s, %s)",  # skills last 5
+                    (desired_role, email, full_name,  # 3 key parameters
+                     python, scala, java, excel, powerpoint,  # first 5
+                     google_analytics, matlab, power_bi, tableau, aws,
+                     hive, spark, postgres, azure, skill_sql  # last 5
+                     )
+                )
+                # g.conn.commit()
+            except g.conn.IntegrityError:
+                # The username was already taken, which caused the
+                # commit to fail. Show a validation error.
+                error = f"User {login} is already registered."
+            else:
+                # Success, go to the login page.
+                return redirect(url_for("index"))
+
+        flash(error)
+
+    return render_template("update.html", user_desired_roles=user_desired_roles, bool_list=bool_list)
 
 
 if __name__ == "__main__":

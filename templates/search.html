@@ -1,0 +1,34 @@
+
+
+  <h1>Upload a New Job</h1>
+
+ Search a job type
+<SELECT name='job_type', method = "GET" action "/">
+{% for jobs in jobtypes_server %}
+    <OPTION value="{{jobs}}">{{jobs}}</option>
+{% endfor %}
+</SELECT>	
+
+<input type="submit" value="Search Job"> 
+
+
+
+  <h1>"Data Jobs" - Website for staffing and 'upskilling'</h1>
+
+ Choose Job Type 
+<SELECT name='searched_role', method = "GET" action "/">
+{% for jobs in jobtypes_server %}
+    <OPTION value="{{jobs}}">{{jobs}}</option>
+{% endfor %}
+</SELECT>	
+
+<input type="submit" value="Search Job"> 
+
+
+  <div>{{data}}</div>
+
+  <div>
+    {% for n in data %}
+    <div>{{n}}</div>
+    {% endfor %}
+  </div>
