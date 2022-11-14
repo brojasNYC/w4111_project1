@@ -8,4 +8,12 @@
     <label for="users_password">Password</label>
     <input type="users_password" name="users_password" id="password" required>
     <input type="submit" value="Register">
+    What is your desired role?
+    <SELECT name='desired_role', method = "GET" action "/">
+    {% for jobs in user_roles %}
+        <OPTION value="{{jobs}}">{{jobs}}</option>
+    {% endfor %}
+    </SELECT>
   </form>
+
+
