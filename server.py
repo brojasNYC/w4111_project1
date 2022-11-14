@@ -168,8 +168,6 @@ def index():
     return render_template("index.html", **context)
 
 
-
-
 @app.route("/search", methods=("GET", "POST"))
 # For william
 def search():
@@ -181,8 +179,6 @@ def search():
     if request.method == "POST":
         job_type = request.form["job_type"]
         print(job_type)
-        context = []
-
         error = None
 
         if not job_type:
@@ -194,19 +190,15 @@ def search():
                                         "WHERE job_type =  %s", job_type)
                 names = []
                 for result in cursor:
-                    names.append(result['name'])  # can also be accessed using result[0]
+                    names.append(result)  # can also be accessed using result[0]
                 cursor.close()
                 context = dict(data=names)
+                return render_template("search.html", jobtypes_server=jobtypes_server, **context)
             finally:
                 print("The try...except block is finished")
-
-    return render_template("search.html", jobtypes_server=jobtypes_server, **context)
-
-    cursor = g.conn.execute("SELECT name FROM pika_table")
-    names = []
-    for result in cursor:
-        names.append(result['name'])  # can also be accessed using result[0]
-    cursor.close()  
+                
+    else:
+        return render_template("search.html", jobtypes_server=jobtypes_server)
 #
 # This is an example of a different path.  You can see it at
 #

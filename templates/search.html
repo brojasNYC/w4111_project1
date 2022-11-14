@@ -1,9 +1,11 @@
 
 
-  <h1>Upload a New Job</h1>
+  <h1>Search Jobs</h1>
 
  Search a job type
-<SELECT name='job_type', method = "GET" action "/">
+ 
+ <form action="/search" method="POST">
+<SELECT name='job_type', method = "POST" action "/">
 {% for jobs in jobtypes_server %}
     <OPTION value="{{jobs}}">{{jobs}}</option>
 {% endfor %}
@@ -11,18 +13,7 @@
 
 <input type="submit" value="Search Job"> 
 
-
-
-  <h1>"Data Jobs" - Website for staffing and 'upskilling'</h1>
-
- Choose Job Type 
-<SELECT name='job_type', method = "GET" action "/">
-{% for jobs in jobtypes_server %}
-    <OPTION value="{{jobs}}">{{jobs}}</option>
-{% endfor %}
-</SELECT>	
-
-<input type="submit" value="Search Job"> 
+</form>
 
 
   <div>{{data}}</div>
@@ -32,3 +23,5 @@
     <div>{{n}}</div>
     {% endfor %}
   </div>
+  
+  
