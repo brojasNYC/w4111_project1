@@ -58,6 +58,8 @@ engine.execute("""CREATE TABLE IF NOT EXISTS pika_table (
 engine.execute("""INSERT INTO pika_table(name) VALUES ('grace hopper'), ('alan turing'), ('ada lovelace');""")
 
 
+
+
 @app.before_request
 def before_request():
     """
@@ -73,6 +75,15 @@ def before_request():
         import traceback;
         traceback.print_exc()
         g.conn = None
+
+#
+# class UsersClass(db.Model):
+#     id = db.Column(db.Integer, primary_key=True)
+#     username = db.Column(db.String(80), unique=True, nullable=False)
+#     email = db.Column(db.String(120), unique=True, nullable=False)
+#
+#     def __repr__(self):
+#         return '<User %r>' % self.username
 
 
 @app.teardown_request
@@ -157,6 +168,45 @@ def index():
     return render_template("index.html", **context)
 
 
+
+
+@app.route("/search", methods=("GET", "POST"))
+# For william
+def search():
+    """
+    Query for all jobs of a given type.
+    """
+    jobtypes_server = ['Data Scientist', 'Data Analyst', 'Data Engineer', 'ML Engineer']
+
+    if request.method == "POST":
+        job_type = request.form["job_type"]
+        print(job_type)
+        context = []
+
+        error = None
+
+        if not job_type:
+            error = "Job search is required."
+
+        if error is None:
+            try:
+                cursor = g.conn.execute("SELECT * FROM datajobs_belong "
+                                        "WHERE job_type =  %s", job_type)
+                names = []
+                for result in cursor:
+                    names.append(result['name'])  # can also be accessed using result[0]
+                cursor.close()
+                context = dict(data=names)
+            finally:
+                print("The try...except block is finished")
+
+    return render_template("search.html", jobtypes_server=jobtypes_server, **context)
+
+    cursor = g.conn.execute("SELECT name FROM pika_table")
+    names = []
+    for result in cursor:
+        names.append(result['name'])  # can also be accessed using result[0]
+    cursor.close()  
 #
 # This is an example of a different path.  You can see it at
 #
@@ -196,25 +246,6 @@ def add():
     return redirect('/')
 
 
-@app.route("/search", methods=("GET", "POST"))
-# For william
-def search():
-    """
-    Query for all jobs of a given type.
-    """
-    jobtypes_server = ['Data Scientist', 'Data Analyst', 'Data Engineer', 'ML Engineer']
-    searched_role = request.form["searched_role"]
-
-    cursor = g.conn.execute("SELECT * FROM datajobs_belong "
-                            "WHERE job_type =  %s", searched_role)
-    names = []
-
-    for result in cursor:
-        names.append(result['name'])  # can also be accessed using result[0]
-    cursor.close()
-
-    context = dict(data=names)
-    # return render_template("search.html", jobtypes_server=jobtypes_server, **context)
 
 
 #
@@ -269,7 +300,7 @@ def register():
 def login():
     """
     Log in a registered user by adding the user id to the session.
-    WORKS
+    Test incorrect username/pw
     """
     if request.method == "POST":
         users_login = request.form["users_login"]
@@ -534,13 +565,13 @@ INCOMPLETE
     user_desired_roles = ['Data Scientist', 'Data Analyst', 'Data Engineer', 'ML Engineer']
     bool_list = ['TRUE', 'FALSE']
     deg_list = ['None', 'High School/GED', 'Associate', 'Bachelors', 'Masters', 'PHD', 'Secret Clown College']
-
+    # current_user = g.conn.session.merge()
     if request.method == "POST":
         desired_role = request.form['desired_role']
         print(desired_role)
 
-        degrees = request.form['education_level']
-        print(degrees)
+        education_level = request.form['education_level']
+        print(education_level)
 
         email = request.form['email']
         print(email)
@@ -597,16 +628,10 @@ INCOMPLETE
 
         error = None
 
-        if not company:
+        if not email:
             error = "Company is required."
-        elif not location:
+        elif not full_name:
             error = "Location is required."
-        elif not position_name:
-            error = "Position name is required."
-        elif not salary:
-            error = "Salary is required"
-        elif not job_type:
-            error = "Job type is required."
 
         # Must execute all commands in one line.
         if error is None:
@@ -624,10 +649,10 @@ INCOMPLETE
                     (desired_role, email, full_name, education_level,  # 4 key parameters
                      python, scala, java, excel, powerpoint,           # first 5
                      google_analytics, matlab, power_bi, tableau, aws,
-                     hive, spark, postgres, azure, skill_sql           # last 5
+                     hive, spark, postgres, azure, skill_sql          # last 5
                      )
                 )
-                # g.conn.commit()
+                g.conn.commit()
             except g.conn.IntegrityError:
                 # The username was already taken, which caused the
                 # commit to fail. Show a validation error.

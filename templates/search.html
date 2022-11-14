@@ -16,7 +16,7 @@
   <h1>"Data Jobs" - Website for staffing and 'upskilling'</h1>
 
  Choose Job Type 
-<SELECT name='searched_role', method = "GET" action "/">
+<SELECT name='job_type', method = "GET" action "/">
 {% for jobs in jobtypes_server %}
     <OPTION value="{{jobs}}">{{jobs}}</option>
 {% endfor %}
