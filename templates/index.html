@@ -21,10 +21,23 @@
 
 
 <ul>
-    {% if g.user %}
-      <li><span>{{ g.user['users_login'] }}</span>
-      <li><a href="{{ url_for('logout') }}">Log Out</a>
-    {% else %}
+
+    {% if g.user['role_level'] == 2%}
+      <li><a href="{{ url_for('upload_job') }}">Upload Role</a>
+    {% endif %}
+
+    {% if g.user['role_level'] == 3%}
+      <li><a href="{{ url_for('upload_ads') }}">Upload Ads</a>
+      <li><a href="{{ url_for('upload_classes') }}">Upload Classes</a>
+    {% endif %}
+
+    {% if g.user['role_level'] == 4%}
+      <li><a href="{{ url_for('upload_job') }}">Upload Role</a>
+      <li><a href="{{ url_for('upload_ads') }}">Upload Ads</a>
+      <li><a href="{{ url_for('upload_classes') }}">Upload Classes</a>
+    {% endif %}
+
+    {% if g.user['role_level'] != null%}
       <li><a href="{{ url_for('register') }}">Register</a>
       <li><a href="{{ url_for('login') }}">Log In</a>
     {% endif %}

@@ -225,11 +225,20 @@ def register():
     """Register a new user.
     Validates that the username is not already taken. - DOES NOT WORK
     """
+    user_roles = ['I am seeking employment!', 'I am a company uploading jobs!', 'I am an advertiser!', 'I am an admin!']
+    user_dict = {
+        'I am seeking employment!' : '1',
+        'I am a company uploading jobs!': '2',
+        'I am an advertiser!' : '3',
+        'I am an admin!' : '4'
+    }
+
     if request.method == "POST":
         users_login = request.form['users_login']
         print(users_login)
         users_password = request.form['users_password']
         print(users_password)
+        users_role = request.form['desired_role']
         error = None
 
         if not users_login:
@@ -240,9 +249,9 @@ def register():
         if error is None:
             try:
                 g.conn.execute(
-                    "INSERT INTO users (users_login, users_password, uid) VALUES (%s, %s, %s)",
-                    (users_login, users_password, uuid.uuid4()),
-                )
+                    "INSERT INTO users (users_login, users_password, uid, role_level) VALUES (%s, %s, %s, %s)",
+                    (users_login, users_password, uuid.uuid4(), user_dict[users_role]),
+               )
                 # g.conn.commit()
             except g.conn.IntegrityError:
                 # The username was already taken, which caused the
@@ -254,7 +263,7 @@ def register():
 
         flash(error)
 
-    return render_template("register.html")
+    return render_template("register.html", user_roles=user_roles)
 
 
 ##
@@ -310,7 +319,6 @@ def logout():
     """
     session.clear()
     return redirect(url_for("index"))
-
 
 @app.route("/upload_job", methods=("GET", "POST"))
 def upload_job():
