@@ -2,7 +2,7 @@
   <h1>Upload a New Job</h1>
 
 
-  <form method="post">
+  <form action="/upload_job" method="post">
     <label for="users_login">Company</label>
     <input name="company" id="company" required>
 	
@@ -18,16 +18,45 @@
 	<!--<label for="job_type">Job Type</label>
     <input type="job_type" name="job_type" id="job_type" required> --> 
 
- <!--https://hackanons.com/2021/09/flask-dropdown-menu-everything-you-need-to-know.html-->
+ <!--https://hackanons.com/2021/09/flask-dropdown-menu-everything-you-need-to-know.html -->
+
+<!--
 
 Choose Job Type 
-<label for="job_type">Job Type</label>
-<SELECT name="Job Type">
+<SELECT name='job_type', method = "GET" action "/">
 {% for jobs in jobtypes_server %}
     <OPTION value={{jobs.job_type}}>{{jobs.job_type}}</option>
 {% endfor %}
-<input type="job_type" name="job_type" id="job_type" required>
 </SELECT>	
-	
-    <input type="submit" value="Upload Job">
-  </form>
+    <button class="button execute" name="submit" value="submit">Submit</button>
+<input type="submit" value="Upload Job"> 
+
+
+ 
+ 
+      <label for="job_type">Choose Job Type</label>
+        <select name="jobtypes_server">
+          {% for jobs in jobtypes_server %}
+            <option value="{{ jobs }}" SELECTED>{{ jobs }}</option>
+          {% endfor %}     
+        </select>
+		
+		<button class="button execute" name="submit" value="submit">Submit</button>
+
+ 
+
+
+-->
+ 
+ Choose Job Type 
+<SELECT name='job_type', method = "GET" action "/">
+{% for jobs in jobtypes_server %}
+    <OPTION value="{{jobs}}">{{jobs}}</option>
+{% endfor %}
+</SELECT>	
+    <button class="button execute" name="submit" value="submit">Submit</button>
+<input type="submit" value="Upload Job"> 
+ 
+
+ 
+</form> 

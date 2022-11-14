@@ -309,7 +309,7 @@ def login():
             # store the user id in a new session and return to the index
             session.clear()
             session["user_id"] = users["uid"]
-            return redirect(url_for("index"))
+            return redirect(url_for("/"))
 
         flash(error)
 
@@ -322,8 +322,8 @@ def upload_job():
     Validates that the username is not already taken. Hashes the
     password for security.
     """
-    jobtypes_server = g.conn.execute("SELECT DISTINCT job_type FROM  DataJobs_Belong ORDER BY  job_type ASC")
-
+    #jobtypes_server = g.conn.execute("SELECT DISTINCT job_type FROM DataJobs_Belong ORDER BY job_type ASC")
+    jobtypes_server = ['Data Scientist', 'Data Analyst', 'Data Engineer', 'ML Engineer']
     if request.method == "POST":
         company = request.form['company']
         print(company)
@@ -370,7 +370,7 @@ def upload_job():
                 error = f"User {login} is already registered."
             else:
                 # Success, go to the login page.
-                return redirect(url_for("login"))
+                return redirect(url_for("index"))
 
         flash(error)
 
