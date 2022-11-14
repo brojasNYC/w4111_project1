@@ -199,6 +199,9 @@ def add():
 @app.route("/search", methods=("GET", "POST"))
 # For william
 def search():
+    """
+    Query for all jobs of a given type.
+    """
     jobtypes_server = ['Data Scientist', 'Data Analyst', 'Data Engineer', 'ML Engineer']
     searched_role = request.form["searched_role"]
 
@@ -220,7 +223,7 @@ def search():
 @app.route("/register", methods=("GET", "POST"))
 def register():
     """Register a new user.
-    Validates that the username is not already taken. - DOES NOT WORK?
+    Validates that the username is not already taken. - DOES NOT WORK
     """
     if request.method == "POST":
         users_login = request.form['users_login']
@@ -264,7 +267,10 @@ def register():
 # LINE 1: SELECT * FROM users WHERE users_login = :users_login
 @app.route("/login", methods=("GET", "POST"))
 def login():
-    """Log in a registered user by adding the user id to the session."""
+    """
+    Log in a registered user by adding the user id to the session.
+    WORKS
+    """
     if request.method == "POST":
         users_login = request.form["users_login"]
         users_password = request.form["users_password"]
@@ -298,16 +304,19 @@ def login():
 
 @app.route("/logout")
 def logout():
-    """Clear the current session, including the stored user id."""
+    """
+    Clear the current session,
+    including the stored user id. - WORKS
+    """
     session.clear()
     return redirect(url_for("index"))
 
 
 @app.route("/upload_job", methods=("GET", "POST"))
 def upload_job():
-    """Register a new job.
-    Validates that the username is not already taken. Hashes the
-    password for security.
+    """
+    Register a new job. - WORKS
+    Adds the UID of the person uploading the job - WORKS
     """
     # jobtypes_server = g.conn.execute("SELECT DISTINCT job_type FROM DataJobs_Belong ORDER BY job_type ASC")
     jobtypes_server = ['Data Scientist', 'Data Analyst', 'Data Engineer', 'ML Engineer']
@@ -476,11 +485,40 @@ def upload_ads():
                            ad_cost_dropdown=ad_cost_dropdown, ad_position_options=ad_position_options)
 
 
-#
-# @app.route('/login')
-# def login():
-#     abort(401)
-#     this_is_never_executed()
+@app.route("/upload_class", methods=("GET", "POST"))
+def upload_classes():
+    """
+    Register a new class.
+    """
+    if request.method == "POST":
+        course_name = request.form['course_name']
+        print(course_name)
+
+        error = None
+
+        if not course_name:
+            error = "course_name is required."
+
+        # Must execute all commands in one line.
+        if error is None:
+            try:
+                g.conn.execute(
+                    "INSERT INTO Training_Material (course_name, course_id)"
+                    "VALUES (%s, %s)",
+                    (course_name, uuid.uuid4()),
+                )
+                # g.conn.commit()
+            except g.conn.IntegrityError:
+                # The username was already taken, which caused the
+                # commit to fail. Show a validation error.
+                error = f"User {course_name} is already registered."
+            else:
+                # Success, go to the login page.
+                return redirect('/')
+
+        flash(error)
+
+    return render_template("upload_class.html")
 
 
 @app.route("/update", methods=("GET", "POST"))
@@ -495,10 +533,14 @@ INCOMPLETE
 
     user_desired_roles = ['Data Scientist', 'Data Analyst', 'Data Engineer', 'ML Engineer']
     bool_list = ['TRUE', 'FALSE']
+    deg_list = ['None', 'High School/GED', 'Associate', 'Bachelors', 'Masters', 'PHD', 'Secret Clown College']
 
     if request.method == "POST":
         desired_role = request.form['desired_role']
         print(desired_role)
+
+        degrees = request.form['education_level']
+        print(degrees)
 
         email = request.form['email']
         print(email)
@@ -571,18 +613,18 @@ INCOMPLETE
             try:
                 g.conn.execute(
                     "INSERT INTO users "
-                    "(desired_role, email, full_name,"
+                    "(desired_role, email, full_name, education_level,"
                     "python, scala, java, excel, powerpoint, google_analytics, matlab, power_bi, tableau, aws, hive, "
                     "spark, postgres, azure, skill_sql) "
                     "VALUES "
-                    "(%s, %s, %s,"  # 3 key parameters
+                    "(%s, %s, %s, %s,"  # 4 key parameters
                     "%s, %s, %s, %s, %s, "  # skills, first 5
                     "%s, %s, %s, %s, %s, "
                     "%s, %s, %s, %s, %s)",  # skills last 5
-                    (desired_role, email, full_name,  # 3 key parameters
-                     python, scala, java, excel, powerpoint,  # first 5
+                    (desired_role, email, full_name, education_level,  # 4 key parameters
+                     python, scala, java, excel, powerpoint,           # first 5
                      google_analytics, matlab, power_bi, tableau, aws,
-                     hive, spark, postgres, azure, skill_sql  # last 5
+                     hive, spark, postgres, azure, skill_sql           # last 5
                      )
                 )
                 # g.conn.commit()
@@ -596,7 +638,7 @@ INCOMPLETE
 
         flash(error)
 
-    return render_template("update.html", user_desired_roles=user_desired_roles, bool_list=bool_list)
+    return render_template("update.html", user_desired_roles=user_desired_roles, bool_list=bool_list, deg_list=deg_list)
 
 
 if __name__ == "__main__":

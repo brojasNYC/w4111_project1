@@ -1,27 +1,29 @@
 
   <h1>Update your Information</h1>
 
+<form action="/update" method="post">
 
-  <form action="/upload_job" method="post">
-    <label for="users_login">Company</label>
-    <input name="company" id="company" required>
-	
-    <label for="location">Position Location</label>
-    <input type="location" name="location" id="location" required>
-	
-	<label for="position_name">Position Name</label>
-    <input type="position_name" name="position_name" id="salary" required>
-	
-	<label for="salary">Salary</label>
-    <input type="salary" name="salary" id="salary" required>
-	
-
- Choose Job Type 
-<SELECT name='job_type', method = "GET" action "/">
-{% for jobs in jobtypes_server %}
+ What is your desired role? 
+<SELECT name='desired_role', method = "GET" action "/">
+{% for jobs in user_desired_roles %}
     <OPTION value="{{jobs}}">{{jobs}}</option>
 {% endfor %}
 </SELECT>	
+
+ What is your education level? 
+<SELECT name='education_level', method = "GET" action "/">
+{% for degs in deg_list %}
+    <OPTION value="{{degs}}">{{degs}}</option>
+{% endfor %}
+</SELECT>	
+
+
+  
+    <label for="email">Email</label>
+    <input name="email" id="email" required>
+	
+    <label for="full_name">Full Name</label>
+    <input type="full_name" name="full_name" id="full_name" required>
 
 
 python
