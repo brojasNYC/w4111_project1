@@ -23,15 +23,18 @@
 <ul>
 
     {% if g.user['role_level'] == 2%}
+       Welcome, Company Seeking Jobs!
       <li><a href="{{ url_for('upload_job') }}">Upload Role</a>
     {% endif %}
 
     {% if g.user['role_level'] == 3%}
+       Welcome, Advertiser!
       <li><a href="{{ url_for('upload_ads') }}">Upload Ads</a>
       <li><a href="{{ url_for('upload_classes') }}">Upload Classes</a>
     {% endif %}
 
     {% if g.user['role_level'] == 4%}
+       Welcome, Admin!
       <li><a href="{{ url_for('upload_job') }}">Upload Role</a>
       <li><a href="{{ url_for('upload_ads') }}">Upload Ads</a>
       <li><a href="{{ url_for('upload_classes') }}">Upload Classes</a>
@@ -40,6 +43,7 @@
     {% if g.user['role_level'] != null%}
       <li><a href="{{ url_for('register') }}">Register</a>
       <li><a href="{{ url_for('login') }}">Log In</a>
+      <li><a href="{{ url_for('logout') }}">Log Out</a>
     {% endif %}
   </ul>
 
