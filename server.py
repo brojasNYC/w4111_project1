@@ -24,7 +24,7 @@ from flask import Flask, request, render_template, g, redirect, Response, url_fo
 from werkzeug.security import generate_password_hash
 
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
-app = Flask(__name__, template_folder=tmpl_dir)
+app = Flask(__name__, template_folder=tmpl_dir) 
 
 # XXX: The Database URI should be in the format of:
 #
@@ -173,6 +173,18 @@ def index():
 def search():
     """
     Query for all jobs of a given type.
+    Works but is messy
+    ('8', 'WorkFusion', '3dc2f5949913c1b7', 'New York, NY 10005', 'Machine Learning Engineer', None, 'ML Engineer', True, False, False, True, False, False, False, False, False, True, False, False, False, True, False)
+
+    Ideally would just output
+    -
+    Company: Workfusion
+    Location: New York
+    Title: Machine Learning Engineer
+    Salary: None
+    Job Type: ML Engineer
+    -
+
     """
     jobtypes_server = ['Data Scientist', 'Data Analyst', 'Data Engineer', 'ML Engineer']
 
@@ -190,7 +202,7 @@ def search():
                                         "WHERE job_type =  %s", job_type)
                 names = []
                 for result in cursor:
-                    names.append(result)  # can also be accessed using result[0]
+                    names.append(result)  # result[0] = uid, result [1] = company, and so on...
                 cursor.close()
                 context = dict(data=names)
                 return render_template("search.html", jobtypes_server=jobtypes_server, **context)
@@ -207,6 +219,8 @@ def search():
 # notice that the functio name is another() rather than index()
 # the functions for each app.route needs to have different names
 #
+
+
 @app.route('/another')
 def another():
     return render_template("anotherfile.html")
@@ -629,9 +643,9 @@ INCOMPLETE
         error = None
 
         if not email:
-            error = "Company is required."
+            error = "email is required."
         elif not full_name:
-            error = "Location is required."
+            error = "full_name is required."
 
         # Must execute all commands in one line.
         if error is None:
@@ -645,7 +659,7 @@ INCOMPLETE
                     "(%s, %s, %s, %s,"  # 4 key parameters
                     "%s, %s, %s, %s, %s, "  # skills, first 5
                     "%s, %s, %s, %s, %s, "
-                    "%s, %s, %s, %s, %s)",  # skills last 5
+                    "%s, %s, %s, %s, %s) ",  # skills last 5
                     (desired_role, email, full_name, education_level,  # 4 key parameters
                      python, scala, java, excel, powerpoint,           # first 5
                      google_analytics, matlab, power_bi, tableau, aws,
