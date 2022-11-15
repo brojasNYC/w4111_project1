@@ -851,7 +851,7 @@ def view_ads():
                             "WHERE training_material.target_audience = %s", session['desired_role'])
     names = []
     for result in cursor:
-        names.append(result[0])  # can also be accessed using result[0]
+        names.append(result)  # can also be accessed using result[0]
     cursor.close()
 
     context = dict(data=names)
