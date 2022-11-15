@@ -787,8 +787,33 @@ def remove_user():
     g.conn.execute(
           "DELETE FROM users WHERE uid =  %s", session["uid"]
     )
-    return render_template("/remove_user")
+    return render_template("index.html")
 
+
+@app.route('/remove_job', methods=['GET', 'POST', 'DELETE'])
+def remove_job():
+    g.conn.execute(
+          "DELETE FROM datajobs_belong WHERE uid =  %s", session["uid"]
+    )
+    return render_template("index.html")
+
+
+@app.route('/remove_ads', methods=['GET', 'POST', 'DELETE'])
+def remove_ads():
+    g.conn.execute(
+          "DELETE ja "
+          "FROM  ads"
+          "INNER JOIN buys "
+          "WHERE uid =  %s", session["uid"]
+    )
+    return render_template("index.html")
+
+
+# def remove_class():
+#     g.conn.execute(
+#           "DELETE FROM training_material WHERE uid =  %s", session["uid"]
+#     )
+#     return render_template("index.html")
 
 if __name__ == "__main__":
     import click
