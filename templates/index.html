@@ -10,6 +10,16 @@
   <h1>"Data Jobs" - Website for staffing and 'upskilling'</h1>
 
 
+
+  <!--<div>{{data}}</div>-->
+
+  <div>
+    {% for n in data %}
+    <div>{{n}}</div>
+    {% endfor %}
+  </div>
+
+
 	<ul>
 	{% if g.user %}
 		  <li><span>User Name:{{ g.user['users_login'] }}</span>
@@ -32,7 +42,6 @@
        Welcome, Advertiser!
       <li><a href="{{ url_for('upload_ads') }}">Upload Ads</a>
       <li><a href="{{ url_for('upload_classes') }}">Upload Classes</a>
-      <li><a href="{{ url_for('remove_ads') }}">Delete Ads</a>
     {% endif %}
 
     {% if g.user['role_level'] == 4%}
@@ -46,6 +55,7 @@
       <li><a href="{{ url_for('register') }}">Register</a>
       <li><a href="{{ url_for('login') }}">Log In</a>
       <li><a href="{{ url_for('logout') }}">Log Out</a>
+      <li><a href="{{ url_for('view_ads') }}">View Courses</a>
 	  <li><a href="{{ url_for('update_users') }}">Update your Account</a>
         <li><a href="{{ url_for('remove_user') }}">Delete My Account</a>
     {% endif %}

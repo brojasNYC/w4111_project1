@@ -110,6 +110,36 @@ def teardown_request(exception):
 # see for routing: http://flask.pocoo.org/docs/0.10/quickstart/#routing
 # see for decorators: http://simeonfranklin.com/blog/2012/jul/1/python-decorators-in-12-steps/
 #
+
+
+@app.before_request
+def load_logged_in_user():
+    """If a user id is stored in the session, load the user object from
+    the database into ``g.user``."""
+    uid = session.get("uid")
+    desired_role = session.get("desired_role")
+
+    if uid is None:
+        g.user = None
+    else:
+        # g.user = (
+        #     g.conn().execute("SELECT * FROM users WHERE uid = %s"), user_id
+        # )
+        g.user = g.conn.execute(
+            "SELECT * FROM users WHERE uid = %s", (uid,)
+        ).fetchone()
+
+    if desired_role is None:
+        g.user = None
+    else:
+        # g.user = (
+        #     g.conn().execute("SELECT * FROM users WHERE uid = %s"), user_id
+        # )
+        g.user = g.conn.execute(
+            "SELECT * FROM users WHERE desired_role = %s", (desired_role,)
+        ).fetchone()
+
+
 @app.route('/')
 def index():
     """
@@ -127,11 +157,34 @@ def index():
     # example of a database query
     #
 
-    cursor = g.conn.execute("SELECT name FROM pika_table")
-    names = []
-    for result in cursor:
-        names.append(result['name'])  # can also be accessed using result[0]
-    cursor.close()
+    #
+    # cursor = g.conn.execute("SELECT course_name, ad_position "
+    #                         "FROM displays "
+    #                         "INNER JOIN "
+    #                         "training_material "
+    #                         "ON "
+    #                         "displays.course_id = training_material.course_id "
+    #                         "INNER JOIN "
+    #                         "ads "
+    #                         "ON "
+    #                         "ads.ad_id = displays.ad_id "
+    #                         "WHERE training_material.target_audience = %s", dr)
+
+    # cursor = g.conn.execute("SELECT course_name, ad_position "
+    #                         "FROM displays "
+    #                         "INNER JOIN "
+    #                         "training_material "
+    #                         "ON "
+    #                         "displays.course_id = training_material.course_id "
+    #                         "INNER JOIN "
+    #                         "ads "
+    #                         "ON "
+    #                         "ads.ad_id = displays.ad_id "
+    #                         "WHERE training_material.target_audience = %s", 'Data Scientist')
+    # names = []
+    # for result in cursor:
+    #     names.append(result)  # can also be accessed using result[0]
+    # cursor.close()
 
     # Flask uses Jinja templates, which is an extension to HTML where you can
     # pass data to a template and dynamically generate HTML based on the data
@@ -157,14 +210,14 @@ def index():
     #     {% for n in data %}
     #     <div>{{n}}</div>
     #     {% endfor %}
-    #
-    context = dict(data=names)
+    # #
+    # context = dict(data=names)
 
     #
     # render_template looks in the templates/ folder for files.
     # for example, the below file reads template/index.html
     #
-    return render_template("index.html", **context)
+    return render_template("index.html")
 
 
 @app.route("/search", methods=("GET", "POST"))
@@ -226,23 +279,6 @@ def search():
 def another():
     return render_template("anotherfile.html")
 
-
-@app.before_request
-def load_logged_in_user():
-    """If a user id is stored in the session, load the user object from
-    the database into ``g.user``."""
-    uid = session.get("uid")
-    #desired_role = session["desired_role"]
-
-    if uid is None:
-        g.user = None
-    else:
-        # g.user = (
-        #     g.conn().execute("SELECT * FROM users WHERE uid = %s"), user_id
-        # )
-        g.user = g.conn.execute(
-            "SELECT * FROM users WHERE uid = %s", (uid,)
-        ).fetchone()
 
 
 @app.route('/add', methods=['POST'])
@@ -358,7 +394,7 @@ def register():
         rows = query.all()
         count = len(rows)
         if(count > 0):
-            return redirect(url_for("register"))
+            return redirect(url_for("index.html"))
 
         if error is None:
             try:
@@ -445,7 +481,7 @@ def login():
             # store the user id in a new session and return to the index
             session.clear()
             session["uid"] = users["uid"]
-            session["desired_role"] = users["desired_role"] # match to target audience in training material/ads
+            session['desired_role'] = users['desired_role']  # match to target audience in training material/ads
             return redirect('/')
 
         flash(error)
@@ -808,23 +844,29 @@ def remove_job():
     return render_template("index.html")
 
 
-@app.route('/remove_ads', methods=['GET', 'POST', 'DELETE'])
-def remove_ads():
-    g.conn.execute(
-          "DELETE "
-          "FROM ads "
-          "INNER JOIN buys"
-          "ON ads.ad_id = buys.ad_id"
-          "WHERE buys.uid =  %s", session["uid"]
-    )
-    return render_template("index.html")
+@app.route('/view_ads', methods=['GET', 'POST', 'DELETE'])
+def view_ads():
 
+    cursor = g.conn.execute("SELECT course_name, ad_position "
+                            "FROM displays "
+                            "INNER JOIN "
+                            "training_material "
+                            "ON "
+                            "displays.course_id = training_material.course_id "
+                            "INNER JOIN "
+                            "ads "
+                            "ON "
+                            "ads.ad_id = displays.ad_id "
+                            "WHERE training_material.target_audience = %s", session['desired_role'])
+    names = []
+    for result in cursor:
+        names.append(result[0])  # can also be accessed using result[0]
+    cursor.close()
 
-# def remove_class():
-#     g.conn.execute(
-#           "DELETE FROM training_material WHERE uid =  %s", session["uid"]
-#     )
-#     return render_template("index.html")
+    context = dict(data=names)
+    
+    return render_template("view_ads.html", **context)
+
 
 if __name__ == "__main__":
     import click
