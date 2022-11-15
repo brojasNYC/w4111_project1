@@ -129,15 +129,6 @@ def load_logged_in_user():
             "SELECT * FROM users WHERE uid = %s", (uid,)
         ).fetchone()
 
-    if desired_role is None:
-        g.user = None
-    else:
-        # g.user = (
-        #     g.conn().execute("SELECT * FROM users WHERE uid = %s"), user_id
-        # )
-        g.user = g.conn.execute(
-            "SELECT * FROM users WHERE desired_role = %s", (desired_role,)
-        ).fetchone()
 
 
 @app.route('/')
