@@ -32,6 +32,7 @@
        Welcome, Advertiser!
       <li><a href="{{ url_for('upload_ads') }}">Upload Ads</a>
       <li><a href="{{ url_for('upload_classes') }}">Upload Classes</a>
+      <li><a href="{{ url_for('remove_ads') }}">Delete Ads</a>
     {% endif %}
 
     {% if g.user['role_level'] == 4%}

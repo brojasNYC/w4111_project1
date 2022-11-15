@@ -357,7 +357,7 @@ def register():
         )
 
         if(query != null):
-            return redirect(url_for("register"))
+            return redirect(url_for("login.html"))
 
         if error is None:
             try:
@@ -801,10 +801,11 @@ def remove_job():
 @app.route('/remove_ads', methods=['GET', 'POST', 'DELETE'])
 def remove_ads():
     g.conn.execute(
-          "DELETE ja "
-          "FROM  ads"
-          "INNER JOIN buys "
-          "WHERE uid =  %s", session["uid"]
+          "DELETE "
+          "FROM ads "
+          "INNER JOIN buys"
+          "ON ads.ad_id = buys.ad_id"
+          "WHERE buys.uid =  %s", session["uid"]
     )
     return render_template("index.html")
 
