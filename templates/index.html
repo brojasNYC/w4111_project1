@@ -6,24 +6,24 @@
     }
   </style>
 
-
 <body>
   <h1>"Data Jobs" - Website for staffing and 'upskilling'</h1>
-  <div>{{data}}</div>
-
-  <div>
-    {% for n in data %}
-    <div>{{n}}</div>
-    {% endfor %}
-  </div>
 
 
+	<ul>
+	{% if g.user %}
+		  <li><span>User Name:{{ g.user['users_login'] }}</span>
+				<br>
+		{% else %}
 
-
-<ul>
-
+		{% endif %}
+  
+  {% if g.user['role_level'] == 1%}
+       Let's find some jobs!
+    {% endif %}
+  
     {% if g.user['role_level'] == 2%}
-       Welcome, Company Seeking Jobs!
+       Welcome, Recruiter!
       <li><a href="{{ url_for('upload_job') }}">Upload Role</a>
     {% endif %}
 
@@ -44,41 +44,33 @@
       <li><a href="{{ url_for('register') }}">Register</a>
       <li><a href="{{ url_for('login') }}">Log In</a>
       <li><a href="{{ url_for('logout') }}">Log Out</a>
+	  <li><a href="{{ url_for('update_users') }}">Update your Account</a>
+    {% endif %}
+	
+	    {% if g.user['role_level'] == null%}
+      <li><a href="{{ url_for('register') }}">Register</a>
+      <li><a href="{{ url_for('login') }}">Log In</a>
     {% endif %}
   </ul>
 
-
-
-
-
-
-
 <br>
-<br>
-
 
 <p><a href="/another">See the Most Popular Data Skills!</a></p>
-
-<br>
-
 <p><a href="/search">Search Jobs</a></p>
 
-<br>
-<p><a href="/register">Sign Up</a></p>
-<p><a href="/login">Log In</a></p>
-<p><a href="/update">Update Profile</a></p>
-
-<br>
-
-<p><a href="/upload_job">Upload Job</a></p>
-<p><a href="/upload_ads">Upload Ads</a></p>
-<p><a href="/upload_class">Upload Class</a></p>
-
-<form method="POST" action="/add">
-<p>Name of new computer scientist: <input type="text" name="name"> <input type="submit" value="Add"></p>
 </form>
 
 </body>
 
+<!--
+<p><a href="/register">Sign Up</a></p>
+<p><a href="/login">Log In</a></p> 
+<p><a href="/update">Update Profile</a></p>
+
+<form method="POST" action="/add">
+<p>Name of new computer scientist: <input type="text" name="name"> <input type="submit" value="Add"></p>
+
+
+-->
 
 </html>

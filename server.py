@@ -208,7 +208,7 @@ def search():
                 return render_template("search.html", jobtypes_server=jobtypes_server, **context)
             finally:
                 print("The try...except block is finished")
-                
+        
     else:
         return render_template("search.html", jobtypes_server=jobtypes_server)
 #
@@ -250,12 +250,9 @@ def add():
     cmd = 'INSERT INTO pika_table(name) VALUES (:name1)';
     g.conn.execute(text(cmd), name1=name);
     return redirect('/')
-
-
-
-
 #
 # CODE DERIVED FROM https://flask.palletsprojects.com/en/2.2.x/tutorial
+
 
 @app.route("/register", methods=("GET", "POST"))
 def register():
