@@ -253,11 +253,7 @@ def add():
     g.conn.execute(text(cmd), name1=name);
     return redirect('/')
 
-@app.route('/', methods=['POST'])
-def remove_user():
-    g.conn.execute(
-          "DELETE FROM users WHERE uid =  %s", session["uid"]
-    )
+
 #
 # CODE DERIVED FROM https://flask.palletsprojects.com/en/2.2.x/tutorial
 
@@ -355,6 +351,14 @@ def register():
         elif not users_password:
             error = "Password is required."
         # Must execute all commands in one line.
+
+        query = g.conn.execute(
+            "SELECT * FROM users WHERE users_login = %s", users_login
+        )
+
+        if(query != null):
+            return redirect(url_for("register"))
+
         if error is None:
             try:
                 # g.conn.execute(
