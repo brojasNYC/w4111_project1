@@ -416,15 +416,9 @@ def login():
             "SELECT * FROM users WHERE users_login = %s", (users_login,)
         ).fetchone()
 
-        # users = g.conn.execute(text(
-        #     'SELECT * FROM users WHERE users_login = :users_login', {users_login})
-        # ).fetchone()
-        #
-        # users = 'INSERT INTO users(users_login) VALUES (:users_login1)';
-        # g.conn.execute(text(insert_login), users_login1=users_login).fetchone();
-
         if users is None:
             error = "Incorrect username."
+
         elif not (users["users_password"], users_password):
             error = "Incorrect password."
 
@@ -432,6 +426,7 @@ def login():
             # store the user id in a new session and return to the index
             session.clear()
             session["uid"] = users["uid"]
+            session["desired_role"] = users["desired_role"]
             return redirect('/')
 
         flash(error)
@@ -576,7 +571,7 @@ def upload_ads():
 
     """
 
-    target_audience_groups = ['Data Scientist', 'Data Analyst', 'Data Engineer', 'ML Engineer']
+    target_audience_groups = ['Data Scientist', 'Data Analyst', 'Data Engineer', 'ML Engineer', 'Novice']
     ad_cost_dropdown = [100, 200, 300]
     ad_position_options = ['Left', 'Right', 'Footer']
 
@@ -658,6 +653,15 @@ def upload_classes():
     return render_template("upload_class.html")
 
 
+
+
+
+
+
+
+
+
+
 @app.route("/update", methods=("GET", "POST"))
 def update_users():
     """
@@ -734,37 +738,13 @@ INCOMPLETE
 
         error = None
 
-        # if not email:
-        #     error = "email is required."
-        # elif not full_name:
-        #     error = "full_name is required."
+        if not email:
+            error = "email is required."
+        elif not full_name:
+            error = "full_name is required."
 
-        # Must execute all commands in one line.
         if error is None:
             try:
-                # g.conn.execute(
-                #     "INSERT INTO users "
-                #     "(desired_role, email, full_name, education_level,"
-                #     "python, scala, java, excel, powerpoint, google_analytics, matlab, power_bi, tableau, aws, hive, "
-                #     "spark, postgres, azure, skill_sql) "
-                #     "VALUES "
-                #     "(%s, %s, %s, %s,"  # 4 key parameters
-                #     "%s, %s, %s, %s, %s, "  # skills, first 5
-                #     "%s, %s, %s, %s, %s, "
-                #     "%s, %s, %s, %s, %s) ",  # skills last 5
-                #     (desired_role, email, full_name, education_level,  # 4 key parameters
-                #      python, scala, java, excel, powerpoint,           # first 5
-                #      google_analytics, matlab, power_bi, tableau, aws,
-                #      hive, spark, postgres, azure, skill_sql          # last 5
-                #      )
-                # )
-                # g.conn.commit()
-                ########
-                # g.conn.execute(
-                #     "UPDATE users SET desired_role = %s, email = %s WHERE uid = %s",
-                #     (desired_role, email, session["uid"])  # last %s is 'where uid = session["uid"] '
-                # )
-                ########
                 g.conn.execute(
                     "UPDATE users "
                     "SET "
