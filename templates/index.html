@@ -45,6 +45,7 @@
       <li><a href="{{ url_for('login') }}">Log In</a>
       <li><a href="{{ url_for('logout') }}">Log Out</a>
 	  <li><a href="{{ url_for('update_users') }}">Update your Account</a>
+        <li><a href="{{ url_for('remove_user') }}">Delete My Account</a>
     {% endif %}
 	
 	    {% if g.user['role_level'] == null%}
