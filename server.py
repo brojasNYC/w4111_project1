@@ -253,7 +253,11 @@ def add():
     g.conn.execute(text(cmd), name1=name);
     return redirect('/')
 
-
+@app.route('/', methods=['POST'])
+def remove_user():
+    g.conn.execute(
+          "DELETE FROM users WHERE uid =  %s", session["uid"]
+    )
 #
 # CODE DERIVED FROM https://flask.palletsprojects.com/en/2.2.x/tutorial
 
