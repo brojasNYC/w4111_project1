@@ -355,8 +355,9 @@ def register():
         query = g.conn.execute(
             "SELECT * FROM users WHERE users_login = %s", users_login
         )
-
-        if(query != null):
+        rows = query.all()
+        count = len(rows)
+        if(count > 0):
             return redirect(url_for("register"))
 
         if error is None:
@@ -430,6 +431,15 @@ def login():
 
         elif not (users["users_password"], users_password):
             error = "Incorrect password."
+
+        query = g.conn.execute(
+            "SELECT * FROM users WHERE users_password = %s AND users_login = %s", users_password, users_login
+        )
+
+        rows = query.all()
+        count = len(rows)
+        if(count <= 0):
+            return redirect(url_for("login"))
 
         if error is None:
             # store the user id in a new session and return to the index
