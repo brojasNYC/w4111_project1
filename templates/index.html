@@ -41,9 +41,14 @@
     {% endif %}
 
     {% if g.user['role_level'] != null%}
+      <li><a href="{{ url_for('logout') }}">Log Out</a>
+      <li><a href="{{ url_for('update_users') }}">Update your Account Information</a>
+    {% endif %}
+
+    {% if g.user['role_level'] == null%}
+      Please login or register!
       <li><a href="{{ url_for('register') }}">Register</a>
       <li><a href="{{ url_for('login') }}">Log In</a>
-      <li><a href="{{ url_for('logout') }}">Log Out</a>
     {% endif %}
   </ul>
 
@@ -63,16 +68,6 @@
 
 <p><a href="/search">Search Jobs</a></p>
 
-<br>
-<p><a href="/register">Sign Up</a></p>
-<p><a href="/login">Log In</a></p>
-<p><a href="/update">Update Profile</a></p>
-
-<br>
-
-<p><a href="/upload_job">Upload Job</a></p>
-<p><a href="/upload_ads">Upload Ads</a></p>
-<p><a href="/upload_class">Upload Class</a></p>
 
 <form method="POST" action="/add">
 <p>Name of new computer scientist: <input type="text" name="name"> <input type="submit" value="Add"></p>

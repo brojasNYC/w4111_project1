@@ -276,6 +276,49 @@ def register():
         users_password = request.form['users_password']
         print(users_password)
         users_role = request.form['desired_role']
+
+        company = request.form['company']
+        print(company)
+        location = request.form['location']
+        print(location)
+        position_name = request.form['position_name']
+        print(position_name)
+        salary = request.form['salary']
+        print(salary)
+        job_type = request.form['job_type']  # dropdown 4 choices
+        print(job_type)
+        # SKILLS #
+        python = request.form['python']
+        print(python)
+        scala = request.form['scala']
+        print(scala)
+        java = request.form['java']
+        print(java)
+        excel = request.form['excel']
+        print(excel)
+        powerpoint = request.form['powerpoint']
+        print(powerpoint)
+        google_analytics = request.form['google_analytics']
+        print(google_analytics)
+        matlab = request.form['matlab']
+        print(matlab)
+        power_bi = request.form['power_bi']
+        print(power_bi)
+        tableau = request.form['tableau']
+        print(tableau)
+        aws = request.form['aws']
+        print(aws)
+        hive = request.form['hive']
+        print(hive)
+        spark = request.form['spark']
+        print(spark)
+        postgres = request.form['postgres']
+        print(postgres)
+        azure = request.form['azure']
+        print(azure)
+        skill_sql = request.form['skill_sql']
+        print(skill_sql)
+
         error = None
 
         if not users_login:
