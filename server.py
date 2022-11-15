@@ -24,7 +24,7 @@ from flask import Flask, request, render_template, g, redirect, Response, url_fo
 from werkzeug.security import generate_password_hash
 
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
-app = Flask(__name__, template_folder=tmpl_dir) 
+app = Flask(__name__, template_folder=tmpl_dir)
 
 # XXX: The Database URI should be in the format of:
 #
@@ -58,8 +58,6 @@ engine.execute("""CREATE TABLE IF NOT EXISTS pika_table (
 engine.execute("""INSERT INTO pika_table(name) VALUES ('grace hopper'), ('alan turing'), ('ada lovelace');""")
 
 
-
-
 @app.before_request
 def before_request():
     """
@@ -75,6 +73,7 @@ def before_request():
         import traceback;
         traceback.print_exc()
         g.conn = None
+
 
 #
 # class UsersClass(db.Model):
@@ -208,9 +207,11 @@ def search():
                 return render_template("search.html", jobtypes_server=jobtypes_server, **context)
             finally:
                 print("The try...except block is finished")
-                
+
     else:
         return render_template("search.html", jobtypes_server=jobtypes_server)
+
+
 #
 # This is an example of a different path.  You can see it at
 #
@@ -252,73 +253,96 @@ def add():
     return redirect('/')
 
 
-
-
 #
 # CODE DERIVED FROM https://flask.palletsprojects.com/en/2.2.x/tutorial
+
 
 @app.route("/register", methods=("GET", "POST"))
 def register():
     """Register a new user.
     Validates that the username is not already taken. - DOES NOT WORK
     """
+    user_desired_roles = ['Data Scientist', 'Data Analyst', 'Data Engineer', 'ML Engineer']
+    bool_list = ['TRUE', 'FALSE']
+    deg_list = ['None', 'High School/GED', 'Associate', 'Bachelors', 'Masters', 'PHD', 'Secret Clown College']
+
     user_roles = ['I am seeking employment!', 'I am a company uploading jobs!', 'I am an advertiser!', 'I am an admin!']
     user_dict = {
-        'I am seeking employment!' : '1',
+        'I am seeking employment!': '1',
         'I am a company uploading jobs!': '2',
-        'I am an advertiser!' : '3',
-        'I am an admin!' : '4'
+        'I am an advertiser!': '3',
+        'I am an admin!': '4'
     }
 
     if request.method == "POST":
         users_login = request.form['users_login']
         print(users_login)
+
         users_password = request.form['users_password']
         print(users_password)
-        users_role = request.form['desired_role']
 
-        company = request.form['company']
-        print(company)
-        location = request.form['location']
-        print(location)
-        position_name = request.form['position_name']
-        print(position_name)
-        salary = request.form['salary']
-        print(salary)
-        job_type = request.form['job_type']  # dropdown 4 choices
-        print(job_type)
+        users_role = request.form['account_type']
+
+        #
+        desired_role = request.form['desired_role']
+        print(desired_role)
+
+        education_level = request.form['education_level']
+        print(education_level)
+
+        email = request.form['email']
+        print(email)
+
+        full_name = request.form['full_name']
+        print(full_name)
+
         # SKILLS #
         python = request.form['python']
         print(python)
+
         scala = request.form['scala']
         print(scala)
+
         java = request.form['java']
         print(java)
+
         excel = request.form['excel']
         print(excel)
+
         powerpoint = request.form['powerpoint']
         print(powerpoint)
+
         google_analytics = request.form['google_analytics']
         print(google_analytics)
+
         matlab = request.form['matlab']
         print(matlab)
+
         power_bi = request.form['power_bi']
         print(power_bi)
+
         tableau = request.form['tableau']
         print(tableau)
+
         aws = request.form['aws']
         print(aws)
+
         hive = request.form['hive']
         print(hive)
+
         spark = request.form['spark']
         print(spark)
+
         postgres = request.form['postgres']
         print(postgres)
+
         azure = request.form['azure']
         print(azure)
+
         skill_sql = request.form['skill_sql']
         print(skill_sql)
 
+        #
         error = None
 
         if not users_login:
@@ -328,10 +352,33 @@ def register():
         # Must execute all commands in one line.
         if error is None:
             try:
+                # g.conn.execute(
+                #     "INSERT INTO users (users_login, users_password, uid, role_level) "
+                #     "VALUES "
+                #     "(%s, %s, %s, %s)",
+                #     (users_login, users_password, uuid.uuid4(), user_dict[users_role]),
+                # )
+                #######
                 g.conn.execute(
-                    "INSERT INTO users (users_login, users_password, uid, role_level) VALUES (%s, %s, %s, %s)",
-                    (users_login, users_password, uuid.uuid4(), user_dict[users_role]),
-               )
+                    "INSERT INTO users "
+                    "(users_login, users_password, uid, role_level,"
+                    "desired_role, email, full_name, education_level,"
+                    "python, scala, java, excel, powerpoint, google_analytics, matlab, power_bi, tableau, aws, hive, "
+                    "spark, postgres, azure, skill_sql) "
+                    "VALUES "
+                    "(%s, %s, %s, %s,"  # 4 login parameters
+                    "%s, %s, %s, %s,"  # next 4 user parameters
+                    "%s, %s, %s, %s, %s, "  # skills, first 5
+                    "%s, %s, %s, %s, %s, "
+                    "%s, %s, %s, %s, %s) ",  # skills last 5
+                    (users_login, users_password, uuid.uuid4(), user_dict[users_role],  # 4 login parameters
+                     desired_role, email, full_name, education_level,  # 4 key parameters
+                     python, scala, java, excel, powerpoint,  # first 5
+                     google_analytics, matlab, power_bi, tableau, aws,
+                     hive, spark, postgres, azure, skill_sql  # last 5
+                     )
+                )
+                #########
                 # g.conn.commit()
             except g.conn.IntegrityError:
                 # The username was already taken, which caused the
@@ -343,7 +390,8 @@ def register():
 
         flash(error)
 
-    return render_template("register.html", user_roles=user_roles)
+    return render_template("register.html", user_roles=user_roles, user_desired_roles=user_desired_roles,
+                           bool_list=bool_list, deg_list=deg_list)
 
 
 ##
@@ -399,6 +447,7 @@ def logout():
     """
     session.clear()
     return redirect(url_for("index"))
+
 
 @app.route("/upload_job", methods=("GET", "POST"))
 def upload_job():
@@ -627,14 +676,14 @@ INCOMPLETE
         desired_role = request.form['desired_role']
         print(desired_role)
 
-        education_level = request.form['education_level']
-        print(education_level)
-
         email = request.form['email']
         print(email)
 
         full_name = request.form['full_name']
         print(full_name)
+
+        education_level = request.form['education_level']
+        print(education_level)
 
         # SKILLS #
         python = request.form['python']
@@ -681,35 +730,56 @@ INCOMPLETE
 
         skill_sql = request.form['skill_sql']
         print(skill_sql)
-        # SKILLS #
+        # # SKILLS #
 
         error = None
 
-        if not email:
-            error = "email is required."
-        elif not full_name:
-            error = "full_name is required."
+        # if not email:
+        #     error = "email is required."
+        # elif not full_name:
+        #     error = "full_name is required."
 
         # Must execute all commands in one line.
         if error is None:
             try:
+                # g.conn.execute(
+                #     "INSERT INTO users "
+                #     "(desired_role, email, full_name, education_level,"
+                #     "python, scala, java, excel, powerpoint, google_analytics, matlab, power_bi, tableau, aws, hive, "
+                #     "spark, postgres, azure, skill_sql) "
+                #     "VALUES "
+                #     "(%s, %s, %s, %s,"  # 4 key parameters
+                #     "%s, %s, %s, %s, %s, "  # skills, first 5
+                #     "%s, %s, %s, %s, %s, "
+                #     "%s, %s, %s, %s, %s) ",  # skills last 5
+                #     (desired_role, email, full_name, education_level,  # 4 key parameters
+                #      python, scala, java, excel, powerpoint,           # first 5
+                #      google_analytics, matlab, power_bi, tableau, aws,
+                #      hive, spark, postgres, azure, skill_sql          # last 5
+                #      )
+                # )
+                # g.conn.commit()
+                ########
+                # g.conn.execute(
+                #     "UPDATE users SET desired_role = %s, email = %s WHERE uid = %s",
+                #     (desired_role, email, session["uid"])  # last %s is 'where uid = session["uid"] '
+                # )
+                ########
                 g.conn.execute(
-                    "INSERT INTO users "
-                    "(desired_role, email, full_name, education_level,"
-                    "python, scala, java, excel, powerpoint, google_analytics, matlab, power_bi, tableau, aws, hive, "
-                    "spark, postgres, azure, skill_sql) "
-                    "VALUES "
-                    "(%s, %s, %s, %s,"  # 4 key parameters
-                    "%s, %s, %s, %s, %s, "  # skills, first 5
-                    "%s, %s, %s, %s, %s, "
-                    "%s, %s, %s, %s, %s) ",  # skills last 5
+                    "UPDATE users "
+                    "SET "
+                    "desired_role = %s, email = %s , full_name = %s , education_level  = %s ,"  # 4 key params
+                    "python = %s , scala = %s , java = %s , excel = %s , powerpoint = %s,"  # first 5
+                    "google_analytics = %s , matlab = %s , power_bi = %s , tableau = %s , aws = %s,"  # second 5
+                    "hive = %s, spark = %s, postgres = %s, azure = %s, skill_sql = %s "  # last 5
+                    "WHERE uid = %s",
                     (desired_role, email, full_name, education_level,  # 4 key parameters
-                     python, scala, java, excel, powerpoint,           # first 5
+                     python, scala, java, excel, powerpoint,  # first 5
                      google_analytics, matlab, power_bi, tableau, aws,
-                     hive, spark, postgres, azure, skill_sql          # last 5
+                     hive, spark, postgres, azure, skill_sql,  # last 5
+                     session["uid"]  # last %s is 'where uid = session["uid"] '
                      )
                 )
-                g.conn.commit()
             except g.conn.IntegrityError:
                 # The username was already taken, which caused the
                 # commit to fail. Show a validation error.

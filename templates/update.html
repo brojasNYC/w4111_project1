@@ -10,6 +10,15 @@
 {% endfor %}
 </SELECT>	
 
+<label for="email">Email</label>
+<input name="email" id="email" required>
+
+
+
+	
+<label for="full_name">Full Name</label>
+<input type="full_name" name="full_name" id="full_name" required>
+ 
  What is your education level? 
 <SELECT name='education_level', method = "GET" action "/">
 {% for degs in deg_list %}
@@ -18,12 +27,6 @@
 </SELECT>	
 
 
-  
-    <label for="email">Email</label>
-    <input name="email" id="email" required>
-	
-    <label for="full_name">Full Name</label>
-    <input type="full_name" name="full_name" id="full_name" required>
 
 
 python
@@ -130,7 +133,7 @@ skill_sql
     <OPTION value="{{bool}}">{{bool}}</option>
 {% endfor %}
 </SELECT>
-	
+
 
     <!-- <button class="button execute" name="submit" value="submit">Submit</button>	--> 
 
