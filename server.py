@@ -232,6 +232,7 @@ def load_logged_in_user():
     """If a user id is stored in the session, load the user object from
     the database into ``g.user``."""
     uid = session.get("uid")
+    #desired_role = session["desired_role"]
 
     if uid is None:
         g.user = None
@@ -430,7 +431,7 @@ def login():
             # store the user id in a new session and return to the index
             session.clear()
             session["uid"] = users["uid"]
-            session["desired_role"] = users["desired_role"]
+            session["desired_role"] = users["desired_role"] # match to target audience in training material/ads
             return redirect('/')
 
         flash(error)
@@ -775,6 +776,14 @@ INCOMPLETE
         flash(error)
 
     return render_template("update.html", user_desired_roles=user_desired_roles, bool_list=bool_list, deg_list=deg_list)
+
+
+@app.route('/remove_user', methods=['GET', 'POST', 'DELETE'])
+def remove_user():
+    g.conn.execute(
+          "DELETE FROM users WHERE uid =  %s", session["uid"]
+    )
+    return render_template("/remove_user")
 
 
 if __name__ == "__main__":
